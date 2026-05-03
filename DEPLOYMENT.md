@@ -53,7 +53,7 @@ The `render.yaml` file is included in the root directory. You can use Render's B
    - **Framework Preset**: Next.js
    - **Root Directory**: `client`
    - **Build Command**: `npm run build`
-   - **Output Directory**: `build`
+   - **Output Directory**: Leave as default (Automatic)
 
 4. Add Environment Variable:
 
@@ -148,6 +148,6 @@ If you see CORS errors in the browser console:
 
 ### Build Failures
 
-1. Ensure `next.config.ts` has `output: 'export'` for static generation
+1. Ensure Vercel "Output Directory" is set to default (Automatic)
 2. Check that all dependencies are in `package.json`
 3. Verify Node.js version compatibility (Next.js 16 requires Node 18+)
