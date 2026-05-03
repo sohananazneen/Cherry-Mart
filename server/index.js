@@ -25,6 +25,11 @@ const allowedOrigins = [
   "http://127.0.0.1:3001",
 ];
 
+// Add production frontend URL if provided
+if (process.env.FRONTEND_URL) {
+  allowedOrigins.push(process.env.FRONTEND_URL);
+}
+
 app.use(
   cors({
     origin: function (origin, callback) {
