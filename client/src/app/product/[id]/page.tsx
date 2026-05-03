@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import {
   Star,
   Heart,
@@ -87,7 +88,7 @@ const relatedProducts = Array.from({ length: 4 }, (_, i) => ({
   originalPrice:
     Math.random() > 0.5 ? Math.floor(Math.random() * 400) + 150 : undefined,
   image: "/api/placeholder/300/300",
-  rating: (Math.random() * 2 + 3).toFixed(1),
+  rating: Number((Math.random() * 2 + 3).toFixed(1)),
   reviews: Math.floor(Math.random() * 500) + 50,
   category: "Electronics",
   isNew: Math.random() > 0.7,
