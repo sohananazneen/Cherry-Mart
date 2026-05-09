@@ -1,7 +1,7 @@
 # Cherry Mart 🍒
 ---
 
-## ��🔗 Relevant Links
+## 🔗 Relevant Links
 
 - 🌐 Live Project: https://cherry-mart.vercel.app/
 - 📁 Repository: https://github.com/sohananazneen/Cherry-Mart.git
