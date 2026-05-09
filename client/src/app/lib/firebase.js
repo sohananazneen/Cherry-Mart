@@ -10,6 +10,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
+<<<<<<< HEAD
 let app;
 let auth = null;
 let googleProvider = null;
@@ -25,5 +26,14 @@ if (firebaseConfig.apiKey) {
     "Firebase API Key is missing. Authentication features will be unavailable.",
   );
 }
+=======
+const app =
+  getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+googleProvider.addScope("email");
+googleProvider.addScope("profile");
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
 
 export { auth, googleProvider };

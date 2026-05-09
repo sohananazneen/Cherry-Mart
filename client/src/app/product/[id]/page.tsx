@@ -98,7 +98,11 @@ const relatedProducts = Array.from({ length: 4 }, (_, i) => ({
 const reviews = [
   {
     id: 1,
+<<<<<<< HEAD
     name: "[user_name]",
+=======
+    name: "John Doe",
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
     rating: 5,
     date: "2024-01-15",
     title: "Amazing sound quality!",
@@ -109,7 +113,11 @@ const reviews = [
   },
   {
     id: 2,
+<<<<<<< HEAD
     name: "[user_name]",
+=======
+    name: "Jane Smith",
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
     rating: 4,
     date: "2024-01-10",
     title: "Great value for money",
@@ -120,7 +128,11 @@ const reviews = [
   },
   {
     id: 3,
+<<<<<<< HEAD
     name: "[user_name]",
+=======
+    name: "Mike Johnson",
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
     rating: 5,
     date: "2024-01-05",
     title: "Best purchase I've made",

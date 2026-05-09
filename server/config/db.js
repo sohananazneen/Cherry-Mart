@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
+<<<<<<< HEAD
     const mongoUri = process.env.MONGO_URI;
 
     if (!mongoUri) {
@@ -14,6 +15,9 @@ const connectDB = async () => {
     }
 
     const conn = await mongoose.connect(mongoUri, {
+=======
+    const conn = await mongoose.connect(process.env.MONGO_URI, {
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
       serverSelectionTimeoutMS: 5000,
       socketTimeoutMS: 45000,
       family: 4,

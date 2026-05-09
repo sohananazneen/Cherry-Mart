@@ -23,6 +23,7 @@ export const API_ENDPOINTS = {
   },
   contact: `${API_BASE_URL}/api/contact`,
   products: `${API_BASE_URL}/api/products`,
+<<<<<<< HEAD
   orders: {
     base: `${API_BASE_URL}/api/orders`,
     myOrders: `${API_BASE_URL}/api/orders/myorders`,
@@ -35,6 +36,8 @@ export const API_ENDPOINTS = {
   adminUsers: {
     base: `${API_BASE_URL}/api/admin/users`,
   },
+=======
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
 };
 
 export default API_BASE_URL;
