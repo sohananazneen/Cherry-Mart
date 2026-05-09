@@ -12,7 +12,12 @@ import adminOrderRoutes from "./routes/admin/orders.js";
 import adminUserRoutes from "./routes/admin/users.js";
 
 // Load env vars
-dotenv.config();
+const result = dotenv.config();
+if (result.error) {
+  console.warn("Warning: .env file not found or could not be loaded. Checking system environment variables...");
+} else {
+  console.log("Environment variables loaded from .env file.");
+}
 
 // Connect to database
 connectDB();
