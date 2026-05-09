@@ -6,13 +6,19 @@ export const protect = async (req, res, next) => {
   try {
     let token;
 
-    // Get token from header
-    if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    // Get token from header or cookie
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
       token = req.headers.authorization.split(" ")[1];
+    } else if (req.cookies && req.cookies.token) {
+      token = req.cookies.token;
     }
 
     // Check if token exists
     if (!token) {
+      console.log("No token found in request headers or cookies.");
       return res.status(401).json({
         success: false,
         message: "Access denied. No token provided."
@@ -21,12 +27,15 @@ export const protect = async (req, res, next) => {
 
     try {
       // Verify token
+      console.log("Verifying token...");
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      console.log("Token decoded successfully. User ID:", decoded.id);
       
       // Get user from database
       const user = await User.findById(decoded.id);
       
       if (!user) {
+        console.log("User not found for token ID.");
         return res.status(401).json({
           success: false,
           message: "Token is valid but user not found."

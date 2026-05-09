@@ -109,7 +109,7 @@ export default function ExplorePage() {
     // Apply rating filter
     if (selectedRating > 0) {
       filtered = filtered.filter(
-        (product) => parseFloat(product.rating) >= selectedRating,
+        (product) => product.rating >= selectedRating,
       );
     }
 
@@ -122,7 +122,7 @@ export default function ExplorePage() {
         filtered.sort((a, b) => b.price - a.price);
         break;
       case "rating":
-        filtered.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
+        filtered.sort((a, b) => b.rating - a.rating);
         break;
       case "newest":
         filtered.sort((a, b) => b.id.localeCompare(a.id));

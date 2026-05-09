@@ -17,10 +17,27 @@ export const API_ENDPOINTS = {
   auth: {
     login: `${API_BASE_URL}/api/auth/login`,
     register: `${API_BASE_URL}/api/auth/register`,
+    adminRegister: `${API_BASE_URL}/api/auth/admin-register`,
     demo: `${API_BASE_URL}/api/auth/demo`,
+    syncFirebase: `${API_BASE_URL}/api/auth/sync-firebase`,
   },
   contact: `${API_BASE_URL}/api/contact`,
   products: `${API_BASE_URL}/api/products`,
+<<<<<<< HEAD
+  orders: {
+    base: `${API_BASE_URL}/api/orders`,
+    myOrders: `${API_BASE_URL}/api/orders/myorders`,
+    myStats: `${API_BASE_URL}/api/orders/mystats`,
+  },
+  adminOrders: {
+    base: `${API_BASE_URL}/api/admin/orders`,
+    stats: `${API_BASE_URL}/api/admin/orders/stats`,
+  },
+  adminUsers: {
+    base: `${API_BASE_URL}/api/admin/users`,
+  },
+=======
+>>>>>>> f1f1528043a94da570396f16daa01989c76685a0
 };
 
 export default API_BASE_URL;

@@ -123,11 +123,6 @@ export function HeroSection() {
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-
-              <Button variant="outline" size="lg" className="group">
-                <Play className="mr-2 h-4 w-4" />
-                Watch Demo
-              </Button>
             </div>
 
             {/* Social Proof */}

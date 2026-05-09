@@ -1,12 +1,23 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connectDB from "./config/db.js";
-import authRoutes from "./routes/auth.js";
-import productRoutes from "./routes/products.js";
+import userAuthRoutes from "./routes/user/auth.js";
+import adminAuthRoutes from "./routes/admin/auth.js";
+import userProductRoutes from "./routes/user/products.js";
+import adminProductRoutes from "./routes/admin/products.js";
+import userOrderRoutes from "./routes/user/orders.js";
+import adminOrderRoutes from "./routes/admin/orders.js";
+import adminUserRoutes from "./routes/admin/users.js";
 
 // Load env vars
-dotenv.config();
+const result = dotenv.config();
+if (result.error) {
+  console.warn("Warning: .env file not found or could not be loaded. Checking system environment variables...");
+} else {
+  console.log("Environment variables loaded from .env file.");
+}
 
 // Connect to database
 connectDB();
@@ -16,6 +27,7 @@ const app = express();
 // Body parser middleware
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // CORS configuration
 const allowedOrigins = [
@@ -54,8 +66,13 @@ app.use(
 );
 
 // Mount routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
+app.use("/api/auth", userAuthRoutes);
+app.use("/api/auth", adminAuthRoutes);
+app.use("/api/products", userProductRoutes);
+app.use("/api/products", adminProductRoutes);
+app.use("/api/orders", userOrderRoutes);
+app.use("/api/admin/orders", adminOrderRoutes);
+app.use("/api/admin/users", adminUserRoutes);
 
 // Root route
 app.get("/", (req, res) => {
