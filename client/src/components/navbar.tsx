@@ -2,16 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Menu,
-  X,
-  ShoppingCart,
-  User,
-  Settings,
-  LogOut,
-  Package,
-  Heart,
-} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Menu, X, LogOut, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -22,18 +14,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { useAuth } from "@/app/lib/AuthContext";
 
-interface NavbarProps {
-  isAuthenticated?: boolean;
-  userRole?: "user" | "admin";
-}
-
-export function Navbar({
-  isAuthenticated = false,
-  userRole = "user",
-}: NavbarProps) {
+export function Navbar() {
+  const router = useRouter();
+  const { user, userRole, logout } = useAuth();
+  const isAuthenticated = !!user;
+  const isAdmin = userRole === "admin";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      router.push("/");
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,7 +46,7 @@ export function Navbar({
     { href: "/", label: "Home" },
     { href: "/explore", label: "Explore" },
     { href: "/about", label: "About" },
-    { href: "/login", label: "Login" },
+    { href: "/contact", label: "Contact" },
   ];
 
   const loggedInRoutes = [
@@ -63,6 +61,14 @@ export function Navbar({
     { href: "/admin/users", label: "Manage Users" },
     { href: "/admin/products", label: "Manage Products" },
     { href: "/admin/reports", label: "Reports" },
+  ];
+
+  const categories = [
+    { href: "/products/electronics", label: "Electronics" },
+    { href: "/products/fashion", label: "Fashion" },
+    { href: "/products/home", label: "Home & Living" },
+    { href: "/products/beauty", label: "Beauty" },
+    { href: "/products/sports", label: "Sports" },
   ];
 
   const currentRoutes = isAuthenticated ? loggedInRoutes : loggedOutRoutes;
@@ -99,7 +105,53 @@ export function Navbar({
               </Link>
             ))}
 
-            {isAuthenticated && userRole === "admin" && (
+            {isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-1"
+                  >
+                    Profile <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">Profile</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/orders">My Orders</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/settings">Settings</Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {!isAuthenticated && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex items-center gap-1"
+                  >
+                    Categories <ChevronDown className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  {categories.map((category) => (
+                    <DropdownMenuItem key={category.href} asChild>
+                      <Link href={category.href}>{category.label}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">
@@ -122,56 +174,18 @@ export function Navbar({
             <ThemeToggle />
 
             {isAuthenticated ? (
-              <>
-                <Button variant="ghost" size="icon" className="relative">
-                  <ShoppingCart className="h-5 w-5" />
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-xs text-primary-foreground">
-                    3
-                  </span>
-                </Button>
-
-                <Button variant="ghost" size="icon">
-                  <Heart className="h-5 w-5" />
-                </Button>
-
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <User className="h-5 w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-56">
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/profile">
-                        <User className="mr-2 h-4 w-4" />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/orders">
-                        <Package className="mr-2 h-4 w-4" />
-                        My Orders
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings">
-                        <Settings className="mr-2 h-4 w-4" />
-                        Settings
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="flex items-center gap-1"
+                onClick={handleLogout}
+              >
+                <LogOut className="h-4 w-4" />
+                Logout
+              </Button>
             ) : (
               <Button asChild>
-                <Link href="/login">Get Started</Link>
+                <Link href="/login">Login</Link>
               </Button>
             )}
 
@@ -205,6 +219,22 @@ export function Navbar({
                   {route.label}
                 </Link>
               ))}
+
+              <div className="border-t pt-3">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+                  Categories
+                </p>
+                {categories.map((category) => (
+                  <Link
+                    key={category.href}
+                    href={category.href}
+                    className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors py-2 pl-4"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {category.label}
+                  </Link>
+                ))}
+              </div>
 
               {isAuthenticated && userRole === "admin" && (
                 <>

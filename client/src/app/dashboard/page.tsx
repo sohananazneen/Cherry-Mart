@@ -1,28 +1,29 @@
-"use client"
+"use client";
 
-import React, { useState, useEffect } from "react"
-import Link from "next/link"
-import { 
-  Home, 
-  Package, 
-  User, 
-  Settings, 
-  ShoppingCart, 
-  Heart, 
-  TrendingUp, 
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+  Home,
+  Package,
+  User,
+  Settings,
+  ShoppingCart,
+  Heart,
+  TrendingUp,
   TrendingDown,
   Calendar,
   DollarSign,
   Users,
   BarChart3,
   PieChart,
-  LineChart
-} from "lucide-react"
-import { Navbar } from "@/components/navbar"
-import { Footer } from "@/components/footer"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+  LineChart,
+} from "lucide-react";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   BarChart,
   Bar,
@@ -36,8 +37,9 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  ResponsiveContainer
-} from "recharts"
+  ResponsiveContainer,
+} from "recharts";
+import { useAuth } from "@/app/lib/AuthContext";
 
 // Mock data for charts
 const monthlyData = [
@@ -47,14 +49,14 @@ const monthlyData = [
   { month: "Apr", orders: 5, spending: 167 },
   { month: "May", orders: 9, spending: 312 },
   { month: "Jun", orders: 6, spending: 198 },
-]
+];
 
 const categoryData = [
   { name: "Electronics", value: 45, color: "#dc2626" },
   { name: "Fashion", value: 30, color: "#fbbf24" },
   { name: "Home", value: 15, color: "#10b981" },
   { name: "Books", value: 10, color: "#3b82f6" },
-]
+];
 
 const recentOrders = [
   {
@@ -63,7 +65,7 @@ const recentOrders = [
     items: 3,
     total: 129.99,
     status: "Delivered",
-    statusColor: "bg-green-100 text-green-800"
+    statusColor: "bg-green-100 text-green-800",
   },
   {
     id: "ORD-002",
@@ -71,7 +73,7 @@ const recentOrders = [
     items: 2,
     total: 89.99,
     status: "Shipped",
-    statusColor: "bg-blue-100 text-blue-800"
+    statusColor: "bg-blue-100 text-blue-800",
   },
   {
     id: "ORD-003",
@@ -79,9 +81,9 @@ const recentOrders = [
     items: 1,
     total: 199.99,
     status: "Processing",
-    statusColor: "bg-yellow-100 text-yellow-800"
+    statusColor: "bg-yellow-100 text-yellow-800",
   },
-]
+];
 
 const wishlistItems = [
   {
@@ -89,42 +91,70 @@ const wishlistItems = [
     name: "Premium Wireless Headphones",
     price: 299.99,
     image: "/api/placeholder/100/100",
-    discount: 20
+    discount: 20,
   },
   {
     id: "WISH-002",
     name: "Smart Watch Pro",
     price: 199.99,
     image: "/api/placeholder/100/100",
-    discount: 0
+    discount: 0,
   },
   {
     id: "WISH-003",
     name: "Laptop Stand",
     price: 49.99,
     image: "/api/placeholder/100/100",
-    discount: 15
+    discount: 15,
   },
-]
+];
 
 const sidebarItems = [
   { href: "/dashboard", icon: Home, label: "Overview", active: true },
-  { href: "/dashboard/orders", icon: Package, label: "My Orders", active: false },
-  { href: "/dashboard/wishlist", icon: Heart, label: "Wishlist", active: false },
+  {
+    href: "/dashboard/orders",
+    icon: Package,
+    label: "My Orders",
+    active: false,
+  },
+  {
+    href: "/dashboard/wishlist",
+    icon: Heart,
+    label: "Wishlist",
+    active: false,
+  },
   { href: "/dashboard/profile", icon: User, label: "Profile", active: false },
-  { href: "/dashboard/settings", icon: Settings, label: "Settings", active: false },
-]
+  {
+    href: "/dashboard/settings",
+    icon: Settings,
+    label: "Settings",
+    active: false,
+  },
+];
 
 export default function DashboardPage() {
-  const [activeSection, setActiveSection] = useState("overview")
-  const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
+  const { user, userRole, loading: authLoading } = useAuth();
+  const [activeSection, setActiveSection] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Check authentication
+    if (!authLoading && !user) {
+      router.push("/login");
+      return;
+    }
+
+    if (!authLoading && user && userRole === "admin") {
+      router.push("/admin/dashboard");
+      return;
+    }
+
     // Simulate loading data
     setTimeout(() => {
-      setIsLoading(false)
-    }, 1000)
-  }, [])
+      setIsLoading(false);
+    }, 1000);
+  }, [user, authLoading, router]);
 
   const overviewCards = [
     {
@@ -134,7 +164,7 @@ export default function DashboardPage() {
       changeType: "increase",
       icon: Package,
       color: "text-blue-600",
-      bgColor: "bg-blue-100"
+      bgColor: "bg-blue-100",
     },
     {
       title: "Total Spent",
@@ -143,7 +173,7 @@ export default function DashboardPage() {
       changeType: "increase",
       icon: DollarSign,
       color: "text-green-600",
-      bgColor: "bg-green-100"
+      bgColor: "bg-green-100",
     },
     {
       title: "Wishlist Items",
@@ -152,7 +182,7 @@ export default function DashboardPage() {
       changeType: "decrease",
       icon: Heart,
       color: "text-red-600",
-      bgColor: "bg-red-100"
+      bgColor: "bg-red-100",
     },
     {
       title: "Member Since",
@@ -161,11 +191,11 @@ export default function DashboardPage() {
       changeType: "neutral",
       icon: Calendar,
       color: "text-purple-600",
-      bgColor: "bg-purple-100"
-    }
-  ]
+      bgColor: "bg-purple-100",
+    },
+  ];
 
-  if (isLoading) {
+  if (isLoading || authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
@@ -177,13 +207,18 @@ export default function DashboardPage() {
         </main>
         <Footer />
       </div>
-    )
+    );
+  }
+
+  // If not authenticated, don't render (will redirect)
+  if (!user) {
+    return null;
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      
+
       <main className="flex-1">
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col lg:flex-row gap-8">
@@ -196,11 +231,26 @@ export default function DashboardPage() {
                       <span className="text-white font-bold">JD</span>
                     </div>
                     <div>
-                      <h3 className="font-semibold text-foreground">John Doe</h3>
-                      <p className="text-sm text-muted-foreground">Premium Member</p>
+                      <h3 className="font-semibold text-foreground">
+                        {user?.displayName || "John Doe"}
+                      </h3>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm text-muted-foreground">
+                          Premium Member
+                        </p>
+                        <span
+                          className={`px-2 py-0.5 text-xs rounded-full font-medium ${
+                            userRole === "admin"
+                              ? "bg-red-100 text-red-800"
+                              : "bg-blue-100 text-blue-800"
+                          }`}
+                        >
+                          {userRole === "admin" ? "Admin" : "User"}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  
+
                   <nav className="space-y-2">
                     {sidebarItems.map((item) => (
                       <Link
@@ -213,7 +263,9 @@ export default function DashboardPage() {
                         }`}
                       >
                         <item.icon className="w-4 h-4" />
-                        <span className="text-sm font-medium">{item.label}</span>
+                        <span className="text-sm font-medium">
+                          {item.label}
+                        </span>
                       </Link>
                     ))}
                   </nav>
@@ -225,8 +277,12 @@ export default function DashboardPage() {
             <div className="flex-1 space-y-8">
               {/* Header */}
               <div>
-                <h1 className="text-3xl font-bold text-foreground mb-2">Dashboard Overview</h1>
-                <p className="text-muted-foreground">Welcome back, John! Here's what's happening with your account.</p>
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  Dashboard Overview
+                </h1>
+                <p className="text-muted-foreground">
+                  Welcome back, John! Here's what's happening with your account.
+                </p>
               </div>
 
               {/* Overview Cards */}
@@ -235,20 +291,35 @@ export default function DashboardPage() {
                   <Card key={index} className="border-0 shadow-sm">
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`w-12 h-12 rounded-xl ${card.bgColor} flex items-center justify-center`}>
+                        <div
+                          className={`w-12 h-12 rounded-xl ${card.bgColor} flex items-center justify-center`}
+                        >
                           <card.icon className={`w-6 h-6 ${card.color}`} />
                         </div>
-                        <div className={`flex items-center text-sm ${
-                          card.changeType === "increase" ? "text-green-600" :
-                          card.changeType === "decrease" ? "text-red-600" : "text-muted-foreground"
-                        }`}>
-                          {card.changeType === "increase" && <TrendingUp className="w-4 h-4 mr-1" />}
-                          {card.changeType === "decrease" && <TrendingDown className="w-4 h-4 mr-1" />}
+                        <div
+                          className={`flex items-center text-sm ${
+                            card.changeType === "increase"
+                              ? "text-green-600"
+                              : card.changeType === "decrease"
+                                ? "text-red-600"
+                                : "text-muted-foreground"
+                          }`}
+                        >
+                          {card.changeType === "increase" && (
+                            <TrendingUp className="w-4 h-4 mr-1" />
+                          )}
+                          {card.changeType === "decrease" && (
+                            <TrendingDown className="w-4 h-4 mr-1" />
+                          )}
                           {card.change}
                         </div>
                       </div>
-                      <h3 className="text-2xl font-bold text-foreground mb-1">{card.value}</h3>
-                      <p className="text-sm text-muted-foreground">{card.title}</p>
+                      <h3 className="text-2xl font-bold text-foreground mb-1">
+                        {card.value}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {card.title}
+                      </p>
                     </CardContent>
                   </Card>
                 ))}
@@ -273,8 +344,19 @@ export default function DashboardPage() {
                         <YAxis yAxisId="right" orientation="right" />
                         <Tooltip />
                         <Legend />
-                        <Bar yAxisId="left" dataKey="orders" fill="#dc2626" name="Orders" />
-                        <Line yAxisId="right" type="monotone" dataKey="spending" stroke="#10b981" name="Spending ($)" />
+                        <Bar
+                          yAxisId="left"
+                          dataKey="orders"
+                          fill="#dc2626"
+                          name="Orders"
+                        />
+                        <Line
+                          yAxisId="right"
+                          type="monotone"
+                          dataKey="spending"
+                          stroke="#10b981"
+                          name="Spending ($)"
+                        />
                       </RechartsLineChart>
                     </ResponsiveContainer>
                   </CardContent>
@@ -296,7 +378,9 @@ export default function DashboardPage() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            `${name} ${((percent || 0) * 100).toFixed(0)}%`
+                          }
                           outerRadius={80}
                           fill="#8884d8"
                           dataKey="value"
@@ -323,19 +407,30 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {recentOrders.map((order) => (
-                      <div key={order.id} className="flex items-center justify-between p-4 border rounded-xl">
+                      <div
+                        key={order.id}
+                        className="flex items-center justify-between p-4 border rounded-xl"
+                      >
                         <div className="flex items-center gap-4">
                           <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center">
                             <Package className="w-5 h-5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="font-medium text-foreground">{order.id}</p>
-                            <p className="text-sm text-muted-foreground">{order.date} • {order.items} items</p>
+                            <p className="font-medium text-foreground">
+                              {order.id}
+                            </p>
+                            <p className="text-sm text-muted-foreground">
+                              {order.date} • {order.items} items
+                            </p>
                           </div>
                         </div>
                         <div className="text-right">
-                          <p className="font-medium text-foreground">${order.total}</p>
-                          <Badge className={order.statusColor}>{order.status}</Badge>
+                          <p className="font-medium text-foreground">
+                            ${order.total}
+                          </p>
+                          <Badge className={order.statusColor}>
+                            {order.status}
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -354,16 +449,25 @@ export default function DashboardPage() {
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {wishlistItems.map((item) => (
-                      <div key={item.id} className="flex items-center gap-3 p-3 border rounded-xl">
+                      <div
+                        key={item.id}
+                        className="flex items-center gap-3 p-3 border rounded-xl"
+                      >
                         <div className="w-16 h-16 rounded-xl bg-muted flex items-center justify-center">
                           <Package className="w-6 h-6 text-muted-foreground" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-foreground truncate">{item.name}</p>
+                          <p className="font-medium text-foreground truncate">
+                            {item.name}
+                          </p>
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-bold text-foreground">${item.price}</span>
+                            <span className="text-sm font-bold text-foreground">
+                              ${item.price}
+                            </span>
                             {item.discount > 0 && (
-                              <Badge variant="destructive" className="text-xs">-{item.discount}%</Badge>
+                              <Badge variant="destructive" className="text-xs">
+                                -{item.discount}%
+                              </Badge>
                             )}
                           </div>
                         </div>
@@ -376,8 +480,8 @@ export default function DashboardPage() {
           </div>
         </div>
       </main>
-      
+
       <Footer />
     </div>
-  )
+  );
 }

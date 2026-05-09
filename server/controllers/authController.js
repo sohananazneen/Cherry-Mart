@@ -90,6 +90,97 @@ export const register = asyncHandler(async (req, res) => {
   sendTokenResponse(user, 201, res, "User registered successfully");
 });
 
+// @desc    Register admin with secret key
+// @route   POST /api/auth/admin-register
+// @access  Public (requires secret key)
+export const registerAdmin = asyncHandler(async (req, res) => {
+  const {
+    name,
+    email,
+    password,
+    adminKey,
+    firebaseUid,
+    displayName,
+    photoURL,
+  } = req.body;
+
+  // Validate admin secret key
+  const ADMIN_SECRET_KEY = process.env.ADMIN_SECRET_KEY;
+  if (!ADMIN_SECRET_KEY) {
+    return res.status(500).json({
+      success: false,
+      message: "Admin registration is not configured",
+    });
+  }
+  if (adminKey !== ADMIN_SECRET_KEY) {
+    return res.status(403).json({
+      success: false,
+      message: "Invalid admin secret key",
+    });
+  }
+
+  // Validate input
+  if (!name || !email || !password) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide name, email, and password",
+    });
+  }
+
+  // Password validation
+  if (password.length < 6) {
+    return res.status(400).json({
+      success: false,
+      message: "Password must be at least 6 characters long",
+    });
+  }
+
+  // Check if user exists - if so, upgrade to admin
+  const existingUser = await User.findOne({ email });
+  let user;
+
+  if (existingUser) {
+    // Upgrade existing user to admin
+    existingUser.role = "admin";
+    if (name) existingUser.name = name;
+    if (firebaseUid) existingUser.firebaseUid = firebaseUid;
+    if (photoURL) existingUser.avatar = photoURL;
+    user = await existingUser.save({ validateBeforeSave: false });
+  } else {
+    // Create new admin user
+    const userData = {
+      name,
+      email,
+      password,
+      role: "admin",
+      firebaseUid: firebaseUid || undefined,
+      avatar: photoURL || "",
+    };
+
+    user = await User.create(userData);
+
+    // Generate email verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    user.emailVerificationToken = verificationToken;
+    await user.save({ validateBeforeSave: false });
+  }
+
+  // Return user data without token for admin registration
+  res.status(201).json({
+    success: true,
+    message: "Admin registered successfully",
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      firebaseUid: user.firebaseUid,
+      avatar: user.avatar,
+      emailVerified: user.emailVerified,
+    },
+  });
+});
+
 // @desc    Login user
 // @route   POST /api/auth/login
 // @access  Public
@@ -366,4 +457,48 @@ export const demoLogin = asyncHandler(async (req, res) => {
   }
 
   sendTokenResponse(user, 200, res, `Demo login successful as ${role}`);
+});
+
+// @desc    Sync Firebase user with MongoDB
+// @route   POST /api/auth/sync-firebase
+// @access  Public
+export const syncFirebaseUser = asyncHandler(async (req, res) => {
+  const { uid, email, displayName, photoURL, emailVerified } = req.body;
+
+  if (!uid || !email) {
+    return res.status(400).json({
+      success: false,
+      message: "UID and email are required",
+    });
+  }
+
+  // Check if user exists by Firebase UID
+  let user = await User.findOne({ firebaseUid: uid });
+
+  if (!user) {
+    // Check if user exists by email (in case they registered with email/password first)
+    user = await User.findOne({ email });
+
+    if (user) {
+      // Update existing user with Firebase UID
+      user.firebaseUid = uid;
+      if (displayName) user.name = displayName;
+      if (photoURL) user.avatar = photoURL;
+      user.emailVerified = emailVerified || false;
+      await user.save({ validateBeforeSave: false });
+    } else {
+      // Create new user from Firebase
+      user = await User.create({
+        firebaseUid: uid,
+        email,
+        name: displayName || email.split("@")[0],
+        avatar: photoURL || "",
+        emailVerified: emailVerified || false,
+        role: "user",
+        password: Math.random().toString(36).slice(-8), // Random password for Firebase users
+      });
+    }
+  }
+
+  sendTokenResponse(user, 200, res, "User synced successfully");
 });

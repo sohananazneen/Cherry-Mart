@@ -17,7 +17,9 @@ export const API_ENDPOINTS = {
   auth: {
     login: `${API_BASE_URL}/api/auth/login`,
     register: `${API_BASE_URL}/api/auth/register`,
+    adminRegister: `${API_BASE_URL}/api/auth/admin-register`,
     demo: `${API_BASE_URL}/api/auth/demo`,
+    syncFirebase: `${API_BASE_URL}/api/auth/sync-firebase`,
   },
   contact: `${API_BASE_URL}/api/contact`,
   products: `${API_BASE_URL}/api/products`,
