@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 10, "column": 0}, "map": {"version":3,"sources":["file:///D:/Working%20Tempo/Assignments/Cherry%20Mart/admin/app/page.tsx"],"sourcesContent":["export default function AdminPage() {\n  return (\n    <div className=\"min-h-screen bg-gray-50\">\n      <div className=\"container mx-auto px-4 py-8\">\n        <h1 className=\"text-3xl font-bold text-gray-900\">Admin Dashboard</h1>\n        <p className=\"mt-4 text-gray-600\">Welcome to the Cherry Mart admin panel.</p>\n      </div>\n    </div>\n  );\n}\n"],"names":["AdminPage","className"],"mappings":";;;;;;AAAe,SAASA;IACtB,qBACE,8OAAC;QAAIC,WAAU;kBACb,cAAA,8OAAC;YAAIA,WAAU;;8BACb,8OAAC;oBAAGA,WAAU;8BAAmC;;;;;;8BACjD,8OAAC;oBAAEA,WAAU;8BAAqB;;;;;;;;;;;;;;;;;AAI1C"}}]
-}
