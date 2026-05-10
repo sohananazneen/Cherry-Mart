@@ -1,24 +1,24 @@
-import React from "react"
-import Image from "next/image"
-import Link from "next/link"
-import { Star, Heart, ShoppingCart, Eye } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Star, Heart, ShoppingCart, Eye } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 interface ProductCardProps {
-  id: string
-  title: string
-  description: string
-  price: number
-  originalPrice?: number
-  image: string
-  rating: number
-  reviews: number
-  category: string
-  badge?: string
-  isNew?: boolean
-  isOnSale?: boolean
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  originalPrice?: number;
+  image: string;
+  rating: number;
+  reviews: number;
+  category: string;
+  badge?: string;
+  isNew?: boolean;
+  isOnSale?: boolean;
 }
 
 export function ProductCard({
@@ -33,22 +33,19 @@ export function ProductCard({
   category,
   badge,
   isNew,
-  isOnSale
+  isOnSale,
 }: ProductCardProps) {
-  const discountPercentage = originalPrice ? Math.round(((originalPrice - price) / originalPrice) * 100) : 0
+  const discountPercentage = originalPrice
+    ? Math.round(((originalPrice - price) / originalPrice) * 100)
+    : 0;
 
   return (
     <Card className="group border-0 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden bg-card">
       <CardContent className="p-0">
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden bg-muted">
-          <div className="w-full h-full bg-gradient-to-br from-primary/10 to-accent/10 flex items-center justify-center">
-            <div className="text-center">
-              <ShoppingCart className="w-16 h-16 text-primary/20 mx-auto mb-2" />
-              <p className="text-sm text-muted-foreground">Product Image</p>
-            </div>
-          </div>
-          
+          <Image src={image} alt={title} fill className="object-cover" />
+
           {/* Badges */}
           <div className="absolute top-3 left-3 flex flex-col gap-2">
             {isNew && (
@@ -57,15 +54,9 @@ export function ProductCard({
               </Badge>
             )}
             {isOnSale && (
-              <Badge variant="destructive">
-                -{discountPercentage}%
-              </Badge>
+              <Badge variant="destructive">-{discountPercentage}%</Badge>
             )}
-            {badge && (
-              <Badge variant="outline">
-                {badge}
-              </Badge>
-            )}
+            {badge && <Badge variant="outline">{badge}</Badge>}
           </div>
 
           {/* Action Buttons */}
@@ -88,13 +79,15 @@ export function ProductCard({
 
           {/* Quick Add Button */}
           <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-background/90 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <Button
-              size="sm"
-              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <ShoppingCart className="w-4 h-4 mr-2" />
-              Add to Cart
-            </Button>
+            <Link href={`/product/${id}`} className="w-full">
+              <Button
+                size="sm"
+                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                View Details
+              </Button>
+            </Link>
           </div>
         </div>
 
@@ -152,7 +145,7 @@ export function ProductCard({
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 // Skeleton Loader Component
@@ -186,7 +179,10 @@ export function ProductCardSkeleton() {
           <div className="flex items-center gap-2">
             <div className="flex space-x-1">
               {[...Array(5)].map((_, i) => (
-                <div key={i} className="w-4 h-4 bg-muted rounded animate-pulse" />
+                <div
+                  key={i}
+                  className="w-4 h-4 bg-muted rounded animate-pulse"
+                />
               ))}
             </div>
             <div className="h-3 w-16 bg-muted rounded animate-pulse" />
@@ -200,5 +196,5 @@ export function ProductCardSkeleton() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

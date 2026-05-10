@@ -23,27 +23,241 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Mock data
-const mockProducts = Array.from({ length: 48 }, (_, i) => ({
-  id: `product-${i + 1}`,
-  title: `Premium Product ${i + 1}`,
-  description: `High-quality product with amazing features and excellent customer reviews. Perfect for your everyday needs.`,
-  price: Math.floor(Math.random() * 500) + 50,
-  originalPrice:
-    Math.random() > 0.5 ? Math.floor(Math.random() * 600) + 100 : undefined,
-  image: `/api/placeholder/300/300`,
-  rating: Math.round((Math.random() * 2 + 3) * 10) / 10,
-  reviews: Math.floor(Math.random() * 1000) + 10,
-  category: ["Electronics", "Fashion", "Home", "Books", "Sports"][
-    Math.floor(Math.random() * 5)
-  ],
-  badge:
-    Math.random() > 0.7
-      ? ["Best Seller", "New", "Limited"][Math.floor(Math.random() * 3)]
-      : undefined,
-  isNew: Math.random() > 0.8,
-  isOnSale: Math.random() > 0.6,
-}));
+// Product data with real images
+const mockProducts = [
+  {
+    id: "1",
+    title: "Premium Wireless Headphones",
+    description:
+      "High-quality wireless headphones with noise cancellation and 30-hour battery life.",
+    price: 299.99,
+    originalPrice: 399.99,
+    image:
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop",
+    rating: 4.8,
+    reviews: 1247,
+    category: "Electronics",
+    badge: "Best Seller",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "2",
+    title: "Organic Cotton T-Shirt",
+    description:
+      "Comfortable and sustainable organic cotton t-shirt available in multiple colors.",
+    price: 29.99,
+    image:
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop",
+    rating: 4.5,
+    reviews: 892,
+    category: "Fashion",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "3",
+    title: "Smart Home Speaker",
+    description:
+      "Voice-controlled smart speaker with premium sound quality and smart home integration.",
+    price: 129.99,
+    originalPrice: 159.99,
+    image:
+      "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?w=400&h=400&fit=crop",
+    rating: 4.6,
+    reviews: 634,
+    category: "Electronics",
+    badge: "Hot Deal",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "4",
+    title: "Yoga Mat Premium",
+    description:
+      "Eco-friendly non-slip yoga mat with carrying strap and alignment lines.",
+    price: 49.99,
+    image:
+      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=400&h=400&fit=crop",
+    rating: 4.7,
+    reviews: 445,
+    category: "Sports",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "5",
+    title: "Stainless Steel Water Bottle",
+    description:
+      "Insulated water bottle keeps drinks cold for 24 hours or hot for 12 hours.",
+    price: 34.99,
+    originalPrice: 44.99,
+    image:
+      "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=400&h=400&fit=crop",
+    rating: 4.9,
+    reviews: 2156,
+    category: "Home",
+    badge: "Best Seller",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "6",
+    title: "Leather Crossbody Bag",
+    description:
+      "Genuine leather crossbody bag with multiple compartments and adjustable strap.",
+    price: 89.99,
+    image:
+      "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=400&h=400&fit=crop",
+    rating: 4.4,
+    reviews: 328,
+    category: "Fashion",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "7",
+    title: "Running Shoes",
+    description:
+      "Lightweight running shoes with cushioned sole and breathable mesh upper.",
+    price: 119.99,
+    originalPrice: 149.99,
+    image:
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=400&fit=crop",
+    rating: 4.7,
+    reviews: 1567,
+    category: "Sports",
+    badge: "Popular",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "8",
+    title: "Ceramic Coffee Mug Set",
+    description: "Set of 4 handcrafted ceramic coffee mugs in assorted colors.",
+    price: 39.99,
+    image:
+      "https://images.unsplash.com/photo-1514228742587-6b1558fcca3d?w=400&h=400&fit=crop",
+    rating: 4.6,
+    reviews: 423,
+    category: "Home",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "9",
+    title: "4K Webcam",
+    description:
+      "Ultra HD 4K webcam with auto-focus and noise-canceling microphone.",
+    price: 149.99,
+    originalPrice: 199.99,
+    image:
+      "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=400&fit=crop",
+    rating: 4.5,
+    reviews: 789,
+    category: "Electronics",
+    badge: "Sale",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "10",
+    title: "Denim Jacket",
+    description: "Classic denim jacket with vintage wash and comfortable fit.",
+    price: 79.99,
+    image:
+      "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&h=400&fit=crop",
+    rating: 4.3,
+    reviews: 234,
+    category: "Fashion",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "11",
+    title: "Resistance Bands Set",
+    description:
+      "Set of 5 resistance bands with different strength levels and handles.",
+    price: 24.99,
+    originalPrice: 34.99,
+    image:
+      "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=400&fit=crop",
+    rating: 4.8,
+    reviews: 1123,
+    category: "Sports",
+    badge: "Best Value",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "12",
+    title: "Scented Candle Set",
+    description: "Set of 3 soy candles with natural essential oil fragrances.",
+    price: 44.99,
+    image:
+      "https://images.unsplash.com/photo-1602607688650-96c3c5c9b81f?w=400&h=400&fit=crop",
+    rating: 4.7,
+    reviews: 567,
+    category: "Home",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "13",
+    title: "Bluetooth Earbuds",
+    description: "True wireless earbuds with charging case and touch controls.",
+    price: 89.99,
+    originalPrice: 119.99,
+    image:
+      "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&h=400&fit=crop",
+    rating: 4.4,
+    reviews: 987,
+    category: "Electronics",
+    isNew: false,
+    isOnSale: true,
+  },
+  {
+    id: "14",
+    title: "Canvas Sneakers",
+    description: "Classic canvas sneakers in white with rubber sole.",
+    price: 59.99,
+    image:
+      "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=400&h=400&fit=crop",
+    rating: 4.5,
+    reviews: 1456,
+    category: "Fashion",
+    isNew: true,
+    isOnSale: false,
+  },
+  {
+    id: "15",
+    title: "Foam Roller",
+    description: "High-density foam roller for muscle recovery and massage.",
+    price: 29.99,
+    image:
+      "https://images.unsplash.com/photo-1600881333168-2ef49b341f30?w=400&h=400&fit=crop",
+    rating: 4.6,
+    reviews: 678,
+    category: "Sports",
+    isNew: false,
+    isOnSale: false,
+  },
+  {
+    id: "16",
+    title: "Throw Pillow Covers",
+    description:
+      "Set of 4 decorative throw pillow covers with modern patterns.",
+    price: 32.99,
+    originalPrice: 42.99,
+    image:
+      "https://images.unsplash.com/photo-1629949009765-40fc74c9ec21?w=400&h=400&fit=crop",
+    rating: 4.5,
+    reviews: 345,
+    category: "Home",
+    isNew: false,
+    isOnSale: true,
+  },
+];
 
 const categories = [
   "All Categories",
@@ -108,9 +322,7 @@ export default function ExplorePage() {
 
     // Apply rating filter
     if (selectedRating > 0) {
-      filtered = filtered.filter(
-        (product) => product.rating >= selectedRating,
-      );
+      filtered = filtered.filter((product) => product.rating >= selectedRating);
     }
 
     // Apply sorting
