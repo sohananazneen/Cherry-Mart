@@ -165,7 +165,7 @@ const sidebarItems = [
 
 export default function AdminDashboardPage() {
   const router = useRouter();
-  const { user, userRole, loading: authLoading } = useAuth();
+  const { user, userRole, loading: authLoading, roleLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("6months");
   const [stats, setStats] = useState<any>({
@@ -177,22 +177,62 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     // Check authentication and admin role
-    if (!authLoading) {
-      if (!user) {
+    // Wait for both auth loading AND role loading to complete
+    console.log(
+      "Dashboard auth check - authLoading:",
+      authLoading,
+      "roleLoading:",
+      roleLoading,
+      "user:",
+      user?.email,
+      "userRole:",
+      userRole,
+    );
+
+    if (!authLoading && !roleLoading) {
+      // Check for Firebase user OR backend token authentication
+      const hasBackendToken =
+        typeof window !== "undefined" && localStorage.getItem("token");
+      const isAuthenticated = user || hasBackendToken;
+
+      if (!isAuthenticated) {
+        console.log("No user or backend token, redirecting to login");
         router.push("/login");
         return;
       }
       if (userRole !== "admin") {
+        console.log(
+          "User role is not admin:",
+          userRole,
+          "- redirecting to user dashboard",
+        );
         router.push("/dashboard");
         return;
       }
+      console.log("Admin access granted");
     }
 
     const fetchAdminData = async () => {
       try {
+        // Get token from localStorage for Authorization header
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        const headers: HeadersInit = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
+        }
+
         const [statsRes, ordersRes] = await Promise.all([
-          fetch(API_ENDPOINTS.adminOrders.stats, { credentials: "include" }),
-          fetch(API_ENDPOINTS.adminOrders.base, { credentials: "include" }),
+          fetch(API_ENDPOINTS.adminOrders.stats, {
+            credentials: "include",
+            headers,
+          }),
+          fetch(API_ENDPOINTS.adminOrders.base, {
+            credentials: "include",
+            headers,
+          }),
         ]);
 
         const statsData = await statsRes.json();
@@ -216,10 +256,18 @@ export default function AdminDashboardPage() {
       }
     };
 
-    if (user && userRole === "admin" && !authLoading) {
+    const hasBackendToken =
+      typeof window !== "undefined" && localStorage.getItem("token");
+    const isAuthenticated = user || hasBackendToken;
+    if (
+      isAuthenticated &&
+      userRole === "admin" &&
+      !authLoading &&
+      !roleLoading
+    ) {
       fetchAdminData();
     }
-  }, [user, userRole, authLoading, router]);
+  }, [user, userRole, authLoading, roleLoading, router]);
 
   const overviewCards = [
     {
@@ -275,7 +323,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (isLoading || authLoading) {
+  if (isLoading || authLoading || roleLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Navbar />
@@ -577,7 +625,9 @@ export default function AdminDashboardPage() {
                               </td>
                               <td className="py-3 px-4">
                                 <span className="text-sm text-muted-foreground">
-                                  {new Date(order.createdAt).toLocaleDateString()}
+                                  {new Date(
+                                    order.createdAt,
+                                  ).toLocaleDateString()}
                                 </span>
                               </td>
                               <td className="py-3 px-4">

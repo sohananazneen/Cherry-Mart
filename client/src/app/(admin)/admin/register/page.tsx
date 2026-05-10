@@ -91,17 +91,8 @@ export default function AdminRegisterPage() {
     setSuccess("");
 
     try {
-      // Try to register with Firebase first
-      try {
-        await registerUser(formData.email.trim(), formData.password);
-      } catch (firebaseError: any) {
-        // If email already exists in Firebase, that's okay - we'll just upgrade them
-        if (firebaseError.code !== "auth/email-already-in-use") {
-          throw firebaseError;
-        }
-      }
-
-      // Register as admin in backend (will create or upgrade user)
+      // 1. Register as admin in backend FIRST (creates user with role: admin)
+      console.log("Calling backend API:", API_ENDPOINTS.auth.adminRegister);
       const response = await fetch(API_ENDPOINTS.auth.adminRegister, {
         method: "POST",
         headers: {
@@ -109,54 +100,76 @@ export default function AdminRegisterPage() {
         },
         body: JSON.stringify({
           name: formData.name.trim(),
-          email: formData.email.trim(),
+          email: formData.email.trim().toLowerCase(),
           password: formData.password,
           adminKey: formData.adminKey,
         }),
       });
 
-      const data = await response.json();
+      console.log("Backend response status:", response.status);
 
-      if (data.success) {
-        // Force sync with backend to update role
-        const syncResponse = await fetch(API_ENDPOINTS.auth.syncFirebase, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            uid: data.user?.firebaseUid || "",
-            email: formData.email.trim(),
-            displayName: formData.name.trim(),
-            photoURL: "",
-            emailVerified: true,
-          }),
-        });
-
-        const syncData = await syncResponse.json();
-        if (syncData.success && syncData.user) {
-          // Force page reload to pick up new role
-          window.location.href = "/admin/dashboard";
-          return;
-        }
-
-        setSuccess(
-          "Admin registration successful! Redirecting to admin dashboard...",
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Backend error response:", errorText);
+        setError(
+          `Server error (${response.status}): ${errorText || "Unknown error"}`,
         );
-        // Store token if provided
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-        }
-        // Redirect to admin dashboard after a short delay
-        setTimeout(() => {
-          router.push("/admin/dashboard");
-        }, 2000);
-      } else {
-        setError(data.message || "Admin registration failed");
+        setLoading(false);
+        return;
       }
+
+      const data = await response.json();
+      console.log("Backend response data:", data);
+
+      if (!data.success) {
+        setError(data.message || "Admin registration failed");
+        setLoading(false);
+        return;
+      }
+
+      // Store token and user data from backend response
+      if (data.token) {
+        localStorage.setItem("token", data.token);
+      }
+      if (data.user) {
+        localStorage.setItem("userRole", data.user.role);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      }
+
+      setSuccess(
+        "Admin registration successful! Redirecting to admin dashboard...",
+      );
+
+      // 2. Try to register with Firebase (best effort - don't block on failure)
+      try {
+        await registerUser(formData.email.trim(), formData.password);
+        // Firebase registration successful - onAuthStateChanged will sync role
+      } catch (firebaseError: any) {
+        // If email already exists in Firebase, try to sign in silently
+        if (firebaseError.code === "auth/email-already-in-use") {
+          console.log("Email already exists in Firebase, proceeding...");
+        } else {
+          console.warn(
+            "Firebase registration failed (non-blocking):",
+            firebaseError.message,
+          );
+        }
+        // Non-blocking: backend registration succeeded, so we can proceed
+      }
+
+      // Redirect to admin dashboard after a short delay
+      setTimeout(() => {
+        router.push("/admin/dashboard");
+      }, 1500);
     } catch (error: any) {
       console.error("Admin registration error:", error);
-      setError(error.message || "Admin registration failed");
+      if (error.name === "TypeError" && error.message.includes("fetch")) {
+        setError(
+          "Cannot connect to server. Please ensure the backend server is running on http://localhost:8080",
+        );
+      } else {
+        setError(error.message || "Admin registration failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -217,6 +230,7 @@ export default function AdminRegisterPage() {
                       onChange={handleChange}
                       className="pl-10"
                       required
+                      autoComplete="name"
                     />
                   </div>
                 </div>
@@ -234,6 +248,7 @@ export default function AdminRegisterPage() {
                       id="email"
                       name="email"
                       type="email"
+                      autoComplete="email"
                       placeholder="Enter your email"
                       value={formData.email}
                       onChange={handleChange}

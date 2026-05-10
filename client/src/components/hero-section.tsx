@@ -94,7 +94,9 @@ export function HeroSection() {
   return (
     <section className="relative min-h-[60vh] lg:min-h-[70vh] overflow-hidden bg-gradient-to-br from-primary/5 to-accent/5">
       {/* Background Pattern */}
-      <div className="absolute inset-0 bg-[url('/api/placeholder/1920/1080')] opacity-5" />
+      <div className="absolute inset-0 opacity-5">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_1px_1px,currentColor_1px,transparent_0)] bg-[length:20px_20px]" />
+      </div>
 
       <div className="container mx-auto px-4 py-12 lg:py-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[60vh] lg:min-h-[70vh]">

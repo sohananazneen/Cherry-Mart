@@ -14,7 +14,7 @@ import { useAuth } from "@/app/lib/AuthContext";
 
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login: loginUser, loginWithGoogle } = useAuth();
+  const { login: loginUser, loginWithGoogle, logout } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -57,17 +57,23 @@ export default function AdminLoginPage() {
     setSuccess("");
 
     try {
-      await loginUser(formData.email.trim(), formData.password);
+      const result = await loginUser(formData.email.trim(), formData.password);
+
+      // Check if the user is actually an admin
+      const role = result.role;
+      if (role !== "admin") {
+        setError("Access denied. You do not have admin privileges.");
+        await logout();
+        return;
+      }
+
       setSuccess("Login successful! Redirecting to admin dashboard...");
-      
-      // Force sync with backend to update role
-      setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 1500);
+
+      // Redirect to admin dashboard
+      router.push("/admin/dashboard");
     } catch (error: any) {
       console.error("Login error:", error);
       setError(error.message || "Login failed");
-    } finally {
       setLoading(false);
     }
   };
@@ -78,17 +84,23 @@ export default function AdminLoginPage() {
     setSuccess("");
 
     try {
-      await loginWithGoogle();
+      const result = await loginWithGoogle();
+
+      // Check if the user is actually an admin
+      const role = result.role;
+      if (role !== "admin") {
+        setError("Access denied. You do not have admin privileges.");
+        await logout();
+        return;
+      }
+
       setSuccess("Google login successful! Redirecting to admin dashboard...");
-      
-      // Force page reload to pick up new role
-      setTimeout(() => {
-        window.location.href = "/admin/dashboard";
-      }, 1500);
+
+      // Redirect to admin dashboard
+      router.push("/admin/dashboard");
     } catch (error: any) {
       console.error("Google login error:", error);
       setError(error.message || "Google login failed");
-    } finally {
       setLoading(false);
     }
   };

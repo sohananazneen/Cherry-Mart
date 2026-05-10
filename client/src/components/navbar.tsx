@@ -9,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -23,6 +21,8 @@ export function Navbar() {
   const isAdmin = userRole === "admin";
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  // Use state for client detection to avoid hydration mismatch
+  const [mounted, setMounted] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -32,6 +32,11 @@ export function Navbar() {
       console.error("Logout error:", error);
     }
   };
+
+  // Set mounted after hydration completes
+  React.useLayoutEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -105,7 +110,7 @@ export function Navbar() {
               </Link>
             ))}
 
-            {isAuthenticated && (
+            {mounted && isAuthenticated && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -130,7 +135,7 @@ export function Navbar() {
               </DropdownMenu>
             )}
 
-            {!isAuthenticated && (
+            {mounted && !isAuthenticated && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -151,7 +156,7 @@ export function Navbar() {
               </DropdownMenu>
             )}
 
-            {isAdmin && (
+            {mounted && isAdmin && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="sm">

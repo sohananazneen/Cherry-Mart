@@ -1,7 +1,46 @@
 import crypto from "crypto";
 import User from "../../models/User.js";
 import asyncHandler from "express-async-handler";
-import { sendTokenResponse } from "../authUtils.js";
+import jwt from "jsonwebtoken";
+
+// Generate JWT token
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || "30d",
+  });
+};
+
+// Send token response
+const sendTokenResponse = (user, statusCode, res, message) => {
+  const token = generateToken(user._id);
+
+  const options = {
+    expires: new Date(
+      Date.now() + (process.env.JWT_COOKIE_EXPIRE || 30) * 24 * 60 * 60 * 1000,
+    ),
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  };
+
+  res
+    .status(statusCode)
+    .cookie("token", token, options)
+    .json({
+      success: true,
+      message,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        firebaseUid: user.firebaseUid,
+        avatar: user.avatar,
+        emailVerified: user.emailVerified,
+      },
+    });
+};
 
 // @desc    Register admin with secret key
 // @route   POST /api/auth/admin-register
@@ -49,18 +88,23 @@ export const registerAdmin = asyncHandler(async (req, res) => {
   }
 
   // Check if user exists - if so, upgrade to admin
+  console.log("Looking for existing user with email:", email);
   const existingUser = await User.findOne({ email });
+  console.log("Existing user found:", existingUser ? "Yes" : "No");
   let user;
 
   if (existingUser) {
     // Upgrade existing user to admin
+    console.log("Upgrading existing user to admin...");
     existingUser.role = "admin";
     if (name) existingUser.name = name;
     if (firebaseUid) existingUser.firebaseUid = firebaseUid;
     if (photoURL) existingUser.avatar = photoURL;
     user = await existingUser.save({ validateBeforeSave: false });
+    console.log("User upgraded successfully:", user._id);
   } else {
     // Create new admin user
+    console.log("Creating new admin user...");
     const userData = {
       name,
       email,
@@ -69,27 +113,24 @@ export const registerAdmin = asyncHandler(async (req, res) => {
       firebaseUid: firebaseUid || undefined,
       avatar: photoURL || "",
     };
+    console.log("User data prepared:", { ...userData, password: "***" });
 
-    user = await User.create(userData);
+    try {
+      user = await User.create(userData);
+      console.log("New user created with ID:", user._id);
 
-    // Generate email verification token
-    const verificationToken = crypto.randomBytes(32).toString("hex");
-    user.emailVerificationToken = verificationToken;
-    await user.save({ validateBeforeSave: false });
+      // Generate email verification token
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      user.emailVerificationToken = verificationToken;
+      await user.save({ validateBeforeSave: false });
+      console.log("Verification token saved");
+    } catch (dbError) {
+      console.error("Database error creating user:", dbError.message);
+      throw dbError;
+    }
   }
 
-  // Return user data without token for admin registration
-  res.status(201).json({
-    success: true,
-    message: "Admin registered successfully",
-    user: {
-      id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      firebaseUid: user.firebaseUid,
-      avatar: user.avatar,
-      emailVerified: user.emailVerified,
-    },
-  });
+  console.log("Admin registration complete, sending response...");
+  // Return token response for immediate login after registration
+  sendTokenResponse(user, 201, res, "Admin registered successfully");
 });
