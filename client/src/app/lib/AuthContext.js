@@ -24,10 +24,7 @@ export const AuthProvider = ({ children }) => {
         headers: {
           "Content-Type": "application/json",
         },
-<<<<<<< HEAD
         credentials: "include",
-=======
->>>>>>> f1f1528043a94da570396f16daa01989c76685a0
         body: JSON.stringify({
           uid: firebaseUser.uid,
           email: firebaseUser.email,

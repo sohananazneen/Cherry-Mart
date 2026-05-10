@@ -54,7 +54,7 @@ const sidebarItems = [
 export default function ManageUsersPage() {
   const router = useRouter();
   const { user: currentUser, userRole, loading: authLoading } = useAuth();
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
@@ -107,7 +107,7 @@ export default function ManageUsersPage() {
     }
   }, [currentUser, userRole, authLoading, router]);
 
-  const filteredUsers = users.filter((user) => {
+  const filteredUsers = users.filter((user: any) => {
     const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -115,7 +115,7 @@ export default function ManageUsersPage() {
     return matchesSearch && matchesRole;
   });
 
-  const handleDeleteUser = async (userId) => {
+  const handleDeleteUser = async (userId: string) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
         const response = await fetch(`${API_ENDPOINTS.adminUsers.base}/${userId}`, {
@@ -134,7 +134,7 @@ export default function ManageUsersPage() {
     }
   };
 
-  const handleVerifyUser = async (userId) => {
+  const handleVerifyUser = async (userId: string) => {
     try {
       const response = await fetch(
         `${API_ENDPOINTS.adminUsers.base}/${userId}/verify`,
@@ -153,7 +153,7 @@ export default function ManageUsersPage() {
     }
   };
 
-  const handleUpdateRole = async (userId, newRole) => {
+  const handleUpdateRole = async (userId: string, newRole: string) => {
     try {
       const response = await fetch(`${API_ENDPOINTS.adminUsers.base}/${userId}/role`, {
         method: "PUT",
@@ -203,7 +203,7 @@ export default function ManageUsersPage() {
                         {currentUser?.displayName
                           ? currentUser.displayName
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")
                               .toUpperCase()
                           : "AD"}

@@ -168,12 +168,12 @@ export default function AdminDashboardPage() {
   const { user, userRole, loading: authLoading } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPeriod, setSelectedPeriod] = useState("6months");
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<any>({
     totalOrders: 0,
     totalRevenue: 0,
     revenueTrend: [],
   });
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     // Check authentication and admin role
@@ -312,7 +312,7 @@ export default function AdminDashboardPage() {
                         {user?.displayName
                           ? user.displayName
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")
                               .toUpperCase()
                           : "AD"}

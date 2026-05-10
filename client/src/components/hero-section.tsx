@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Play, Star, ShoppingCart, Zap } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, Play, Star, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
@@ -20,7 +21,8 @@ export function HeroSection() {
       subtitle: "Discover amazing items at unbeatable prices",
       description:
         "Shop from our curated collection of premium products with fast delivery and exceptional customer service.",
-      image: "/api/placeholder/600/400",
+      image:
+        "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
       badge: "New Collection",
     },
     {
@@ -28,7 +30,8 @@ export function HeroSection() {
       subtitle: "Limited time offer on selected items",
       description:
         "Don&apos;t miss out on our biggest sale of the season. Premium products at half the price!",
-      image: "/api/placeholder/600/400",
+      image:
+        "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=800&h=600&fit=crop",
       badge: "Hot Deal",
     },
     {
@@ -36,7 +39,8 @@ export function HeroSection() {
       subtitle: "On orders over $50",
       description:
         "Get your favorite products delivered to your doorstep without any shipping charges.",
-      image: "/api/placeholder/600/400",
+      image:
+        "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&h=600&fit=crop",
       badge: "Free Shipping",
     },
   ];
@@ -162,11 +166,15 @@ export function HeroSection() {
                 {slides.map((slide, index) => (
                   <div
                     key={index}
-                    className="min-w-full h-full flex items-center justify-center"
+                    className="min-w-full h-full relative flex items-center justify-center"
                   >
-                    <div className="w-full h-full bg-gradient-to-br from-primary/20 to-accent/20 flex items-center justify-center">
-                      <ShoppingCart className="w-24 h-24 text-primary/20" />
-                    </div>
+                    <Image
+                      src={slide.image}
+                      alt={slide.title}
+                      fill
+                      className="object-cover"
+                      priority={index === 0}
+                    />
                   </div>
                 ))}
               </div>

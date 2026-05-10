@@ -138,12 +138,12 @@ export default function DashboardPage() {
   const { user, userRole, loading: authLoading } = useAuth();
   const [activeSection, setActiveSection] = useState("overview");
   const [isLoading, setIsLoading] = useState(true);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<any>({
     totalOrders: 0,
     totalSpent: 0,
     monthlyData: [],
   });
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
     // Check authentication
@@ -266,7 +266,7 @@ export default function DashboardPage() {
                         {user?.displayName
                           ? user.displayName
                               .split(" ")
-                              .map((n) => n[0])
+                              .map((n: string) => n[0])
                               .join("")
                               .toUpperCase()
                           : "U"}
